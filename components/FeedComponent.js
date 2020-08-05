@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import { View, FlatList, StyleSheet, TouchableWithoutFeedback, Alert } from 'react-native';
+import { View, FlatList, StyleSheet, TouchableWithoutFeedback, Alert, ActivityIndicator } from 'react-native';
 import ActionButton from 'react-native-action-button';
 import { SearchBar, Text, Avatar, Card, Divider, Icon, Button } from 'react-native-elements';
 import { baseUrl } from '../shared/baseurl';
 import { connect } from 'react-redux';
-import { fetchPosts, fetchPages, fetchComments, deletePage, deletePost } from '../redux/ActionCreators';
+import { clearPosts, fetchPosts, fetchPages, fetchComments, deletePage, deletePost } from '../redux/ActionCreators';
 
 const mapStateToProps = state => {
     return {
@@ -15,7 +15,8 @@ const mapStateToProps = state => {
 }
 
 const mapDispatchToProps = dispatch => ({
-    fetchPosts: () => dispatch(fetchPosts()),
+    clearPosts: () => dispatch(clearPosts()),
+    fetchPosts: (offset) => dispatch(fetchPosts(offset)),
     fetchPages: () => dispatch(fetchPages()),
     fetchComments: () => dispatch(fetchComments()),
     deletePage: (pageId) => dispatch(deletePage(pageId)),
@@ -160,6 +161,7 @@ class Feed extends Component {
         return (
             <>
                 <FlatList
+                    ref={(ref) => { this.flatListRef = ref; }}
                     data={this.props.posts.posts
                         .filter((item) => {
                             //applying filter for the inserted text in search bar
@@ -171,10 +173,10 @@ class Feed extends Component {
                     renderItem={this.renderPost}
                     style={{ paddingBottom: 50 }}
                     keyExtractor={item => item._id}
-                    initialNumToRender={5}
                     onRefresh={() => {
                         this.props.fetchPages();
-                        this.props.fetchPosts();
+                        this.props.clearPosts();
+                        this.props.fetchPosts(0);
                         this.props.fetchComments();
                     }}
                     refreshing={this.props.posts.isLoading}
@@ -208,19 +210,31 @@ class Feed extends Component {
                             </Card>
                         </>
                     }
+                    ListFooterComponent={
+                        <Button
+                            title="Load More"
+                            type='clear'
+                            onPress={() => this.props.fetchPosts(this.props.posts.offset)}
+                            containerStyle={{ alignItems: 'center', justifyContent: 'center', marginVertical: 15 }}
+                            buttonStyle={{ height: 25, width: 100 }}
+                            titleStyle={{ fontSize: 12 }}
+                        />
+                    }
                 />
-                {this.props.auth.isAuthenticated &&
-                    <ActionButton buttonColor="rgba(231,76,60,1)">
+
+                <ActionButton buttonColor="rgba(231,76,60,1)">
+                    {this.props.auth.isAuthenticated &&
                         <ActionButton.Item buttonColor='#3498db' title="New Page" onPress={() => { this.props.navigation.navigate('Create Page') }}>
                             <Icon name="newspaper-plus" type='material-community' iconStyle={styles.actionButtonIcon} />
-                        </ActionButton.Item>
-                        <ActionButton.Item buttonColor='#1abc9c' title="Saved" onPress={() => {
-                            this.props.navigation.navigate('Saved')
-                        }}>
+                        </ActionButton.Item>}
+                    {this.props.auth.isAuthenticated &&
+                        <ActionButton.Item buttonColor='#1abc9c' title="Saved" onPress={() => { this.props.navigation.navigate('Saved') }}>
                             <Icon name="bookmark" type='font-awesome' iconStyle={styles.actionButtonIcon} />
-                        </ActionButton.Item>
-                    </ActionButton>
-                }
+                        </ActionButton.Item>}
+                    <ActionButton.Item buttonColor='#9b59b6' title="Scroll to Top" onPress={() => { this.flatListRef.scrollToOffset({ animated: true, offset: 0 }) }}>
+                        <Icon name="chevron-up" type='font-awesome' iconStyle={styles.actionButtonIcon} />
+                    </ActionButton.Item>
+                </ActionButton>
             </>
         );
     }

@@ -48,6 +48,10 @@ export const imageUpload = (url, name) => async (dispatch) => {
 
 // Handling Posts
 
+export const clearPosts = () => ({
+    type: ActionTypes.CLEAR_POSTS
+});
+
 export const postsLoading = () => ({
     type: ActionTypes.POSTS_LOADING
 });
@@ -62,11 +66,11 @@ export const addPosts = (posts) => ({
     payload: posts
 });
 
-export const fetchPosts = () => async (dispatch) => {
+export const fetchPosts = (offset) => async (dispatch) => {
 
     dispatch(postsLoading());
 
-    return fetch(baseUrl + 'posts')
+    return fetch(baseUrl + 'posts?limit=20&offset=' + offset)
         .then(response => {
             if (response.ok) {
                 return response;

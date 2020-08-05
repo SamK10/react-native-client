@@ -14,7 +14,7 @@ import CreatePage from './Page';
 import CreatePost from './Post';
 import CreateEvent from './Event';
 import { connect } from 'react-redux';
-import { fetchPosts, fetchComments, fetchPages, fetchEvents, fetchSaves, /*getAuth*/ } from '../redux/ActionCreators';
+import { fetchPosts, fetchComments, fetchPages, fetchEvents, fetchSaves, clearPosts, /*getAuth*/ } from '../redux/ActionCreators';
 
 const mapStateToProps = state => {
     return {
@@ -29,7 +29,8 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => ({
     fetchEvents: () => dispatch(fetchEvents()),
-    fetchPosts: () => dispatch(fetchPosts()),
+    clearPosts: () => dispatch(clearPosts()),
+    fetchPosts: (offset) => dispatch(fetchPosts(offset)),
     fetchComments: () => dispatch(fetchComments()),
     fetchPages: () => dispatch(fetchPages()),
     fetchSaves: () => dispatch(fetchSaves()),
@@ -215,7 +216,8 @@ class Main extends Component {
     componentDidMount() {
         //this.props.getAuth();
         this.props.fetchPages();
-        this.props.fetchPosts();
+        this.props.clearPosts();
+        this.props.fetchPosts(0);
         this.props.fetchComments();
         this.props.fetchSaves();
         this.props.fetchEvents();

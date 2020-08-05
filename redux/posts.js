@@ -3,11 +3,15 @@ import * as ActionTypes from './ActionTypes';
 export const posts = (state = {
     isLoading: true,
     errMess: null,
+    offset: 0,
     posts: []
 }, action) => {
     switch (action.type) {
+        case ActionTypes.CLEAR_POSTS:
+            return { ...state, isLoading: false, errMess: null, posts: [], offset: 0 };
+
         case ActionTypes.ADD_POSTS:
-            return { ...state, isLoading: false, errMess: null, posts: action.payload };
+            return { ...state, isLoading: false, errMess: null, posts: state.posts.concat(action.payload), offset: state.offset + action.payload.length };
 
         case ActionTypes.POSTS_LOADING:
             return { ...state, isLoading: true, errMess: null }

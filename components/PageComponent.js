@@ -4,7 +4,7 @@ import { SearchBar, Text, Image, Avatar, Button, Card, Divider, Icon } from 'rea
 import ActionButton from 'react-native-action-button';
 import { baseUrl } from '../shared/baseurl';
 import { connect } from 'react-redux';
-import { fetchPosts, fetchEvents, fetchComments, deletePost, deleteEvent } from '../redux/ActionCreators';
+import { fetchPosts, fetchEvents, fetchComments, deletePost, deleteEvent, clearPosts } from '../redux/ActionCreators';
 
 const mapStateToProps = state => {
     return {
@@ -16,7 +16,8 @@ const mapStateToProps = state => {
 }
 
 const mapDispatchToProps = dispatch => ({
-    fetchPosts: () => dispatch(fetchPosts()),
+    clearPosts: () => dispatch(clearPosts()),
+    fetchPosts: (offset) => dispatch(fetchPosts(offset)),
     fetchEvents: () => dispatch(fetchEvents()),
     fetchComments: () => dispatch(fetchComments()),
     deletePost: (postId) => dispatch(deletePost(postId)),
@@ -152,6 +153,7 @@ class Page extends Component {
         return (
             <View >
                 <FlatList
+                    ref={(ref) => { this.flatListRef = ref; }}
                     data={this.props.posts.posts
                         .filter((post) => post.title === this.props.route.params.page)
                         .filter((item) => {
@@ -162,10 +164,13 @@ class Page extends Component {
                         })
                     }
                     renderItem={this.renderPost}
-                    style={{ marginBottom: 10 }}
                     keyExtractor={item => item._id}
-                    initialNumToRender={5}
-                    onRefresh={() => { this.props.fetchPosts(); this.props.fetchEvents(); this.props.fetchComments(); }}
+                    onRefresh={() => {
+                        this.props.clearPosts();
+                        this.props.fetchPosts(0);
+                        this.props.fetchEvents();
+                        this.props.fetchComments();
+                    }}
                     refreshing={this.props.posts.isLoading}
                     ListHeaderComponent={
                         <View>
@@ -210,26 +215,39 @@ class Page extends Component {
                             </Card>
                         </View>
                     }
+                    ListFooterComponent={
+                        <Button
+                            title="Load More"
+                            type='clear'
+                            onPress={() => this.props.fetchPosts(this.props.posts.offset)}
+                            containerStyle={{ alignItems: 'center', justifyContent: 'center', marginVertical: 15 }}
+                            buttonStyle={{ height: 25, width: 100 }}
+                            titleStyle={{ fontSize: 12 }}
+                        />
+                    }
                 />
-                {
-                    this.props.auth.isAuthenticated && this.state.current_page.owner._id === this.props.auth.user._id &&
-                    < ActionButton buttonColor="rgba(231,76,60,1)" >
+
+                <ActionButton buttonColor="rgba(231,76,60,1)" >
+                    {this.props.auth.isAuthenticated && (this.state.current_page.owner._id === this.props.auth.user._id) &&
                         <ActionButton.Item buttonColor='#9b59b6' title="New Post" onPress={() => {
                             this.props.navigation.navigate('Create Post', {
                                 pageTitle: page
                             })
                         }}>
                             <Icon name="pencil" type='font-awesome' iconStyle={styles.actionButtonIcon} />
-                        </ActionButton.Item>
+                        </ActionButton.Item>}
+                    {this.props.auth.isAuthenticated && this.state.current_page.owner._id == this.props.auth.user._id &&
                         <ActionButton.Item buttonColor='#1abc9c' title="New Event" onPress={() => {
                             this.props.navigation.navigate('Create Event', {
                                 pageTitle: page
                             })
                         }}>
                             <Icon name="calendar" type='font-awesome' iconStyle={styles.actionButtonIcon} />
-                        </ActionButton.Item>
-                    </ActionButton>
-                }
+                        </ActionButton.Item>}
+                    <ActionButton.Item buttonColor='#3498db' title="Scroll to Top" onPress={() => { this.flatListRef.scrollToOffset({ animated: true, offset: 0 }) }}>
+                        <Icon name="chevron-up" type='font-awesome' iconStyle={styles.actionButtonIcon} />
+                    </ActionButton.Item>
+                </ActionButton>
             </View >
         );
     }

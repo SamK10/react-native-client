@@ -156,7 +156,7 @@ class PostDetail extends Component {
         const postId = this.props.route.params.postId;
         const post = this.props.posts.posts.filter((post) => post._id === postId)[0];
         return (
-            <View style={{ flex: 1 }}>
+            <>
                 <ScrollView>
                     <RenderPostDetail post={this.props.posts.posts.filter((post) => post._id === postId)[0]}
                     />
@@ -224,7 +224,7 @@ class PostDetail extends Component {
                         </ActionButton.Item>
                     </ActionButton>
                 }
-            </View>
+            </>
         )
     }
 }
