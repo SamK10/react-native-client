@@ -2,6 +2,7 @@ import * as ActionTypes from './ActionTypes';
 import { baseUrl } from '../shared/baseurl';
 import { ToastAndroid } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
+import * as Notifications from 'expo-notifications';
 
 // Uploading Image
 
@@ -118,6 +119,17 @@ export const postPost = (title, details, avatar_url) => async (dispatch) => {
         .then(response => {
             if (response.ok) {
                 alert('Post added');
+                Notifications.setNotificationHandler({
+                    handleNotification: async () => {
+                        return {
+                            shouldShowAlert: true,
+                            shouldPlaySound: true,
+                            shouldSetBadge: true,
+                        };
+                    },
+                });
+                const content = { title: 'I am a one, hasty notification.' };
+                Notifications.scheduleNotificationAsync({ content, trigger: null });
                 return response;
             } else {
                 var error = new Error('Error ' + response.status + ': ' + response.statusText);
