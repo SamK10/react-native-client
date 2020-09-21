@@ -13,6 +13,7 @@ import Page from './PageComponent';
 import CreatePage from './Page';
 import CreatePost from './Post';
 import CreateEvent from './Event';
+import ImageView from './ImageComponent';
 import { connect } from 'react-redux';
 import { fetchPosts, fetchComments, fetchPages, fetchEvents, fetchSaves, clearPosts, /*getAuth*/ } from '../redux/ActionCreators';
 
@@ -101,6 +102,13 @@ const PostStack = () => {
                 component={SavedStack}
                 options={{
                     headerTitleAlign: 'center'
+                }}
+            />
+            <Stack.Screen
+                name="ImageView"
+                component={ImageView}
+                options={{
+                    title: ''
                 }}
             />
         </Stack.Navigator>
