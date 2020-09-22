@@ -25,17 +25,14 @@ function History() {
 class About extends Component {
     render() {
         return (
-            <ScrollView>
+            <View>
                 <History />
                 <Card
-                    title='Contact Us'
+                    title='Contact Me'
                     containerStyle={{ elevation: 5 }}
                 >
                     <Text style={{ margin: 5, fontWeight: 'bold', fontSize: 16 }}>Samir Kumar</Text>
                     <Text style={{ margin: 5 }}>Indian Institute of Technology, Kharagpur</Text>
-                    <Text style={{ margin: 5 }}>Mobile: +91 86976 67650</Text>
-                    <Text style={{ margin: 5 }}>Whatsapp: +91 8697667650</Text>
-                    <Text style={{ margin: 5 }}>LinkedIn: samir-kumar-1a0b42190</Text>
                     <Text style={{ margin: 5 }}>Email: sk66215@gmail.com</Text>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}>
                         <Icon
@@ -74,9 +71,18 @@ class About extends Component {
                             onPress={() => Linking.openURL('whatsapp://send?text=Hello&phone=918697667650')}
                             size={16}
                         />
+                        <Icon
+                            raised
+                            reverse
+                            name='github'
+                            type='font-awesome'
+                            color='#24292E'
+                            onPress={() => Linking.openURL('https://github.com/SamK10/app-react-native-client')}
+                            size={16}
+                        />
                     </View>
                 </Card>
-            </ScrollView>
+            </View>
         );
     }
 }
