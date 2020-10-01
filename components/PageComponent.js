@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { View, FlatList, StyleSheet, TouchableWithoutFeedback, Alert } from 'react-native';
 import { SearchBar, Text, Image, Avatar, Button, Card, Divider, Icon } from 'react-native-elements';
 import ActionButton from 'react-native-action-button';
+import * as Calendar from 'expo-calendar';
 import { baseUrl } from '../shared/baseurl';
 import { connect } from 'react-redux';
 import { fetchPosts, fetchEvents, fetchComments, deletePost, deleteEvent, clearPosts } from '../redux/ActionCreators';
@@ -23,6 +24,30 @@ const mapDispatchToProps = dispatch => ({
     deletePost: (postId) => dispatch(deletePost(postId)),
     deleteEvent: (eventId) => dispatch(deleteEvent(eventId))
 })
+
+async function getDefaultCalendarSource() {
+    const calendars = await Calendar.getCalendarsAsync();
+    const defaultCalendars = calendars.filter(each => each.source.name === 'Default');
+    return defaultCalendars[0].source;
+}
+
+async function createCalendar() {
+    const defaultCalendarSource =
+        Platform.OS === 'ios'
+            ? await getDefaultCalendarSource()
+            : { isLocalAccount: true, name: 'Expo Calendar' };
+    const newCalendarID = await Calendar.createCalendarAsync({
+        title: 'Expo Calendar',
+        color: 'blue',
+        entityType: Calendar.EntityTypes.EVENT,
+        sourceId: defaultCalendarSource.id,
+        source: defaultCalendarSource,
+        name: 'internalCalendarName',
+        ownerAccount: 'personal',
+        accessLevel: Calendar.CalendarAccessLevel.OWNER,
+    });
+    console.log(`Your new calendar ID is: ${newCalendarID}`);
+}
 
 class Page extends Component {
 
@@ -62,8 +87,30 @@ class Page extends Component {
             else
                 return
         }
+        const calendarEvent = () => {
+            Alert.alert(
+                "Add Event to calendar?",
+                "Add Event",
+                [
+                    {
+                        text: "Cancel",
+                        style: "cancel"
+                    },
+                    /*{
+                        text: "Edit",
+                        onPress: () => {}
+                    },*/
+                    {
+                        text: "Add",
+                        onPress: () => createCalendar()
+                    }
+                ],
+                { cancelable: false }
+            );
+        }
         return (
             <TouchableWithoutFeedback
+                onPress={calendarEvent}
                 onLongPress={handleEvent}
             >
                 <Card
