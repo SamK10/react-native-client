@@ -175,12 +175,20 @@ class Page extends Component {
                     ListHeaderComponent={
                         <View>
                             <Card containerStyle={{ margin: 0, padding: 0, paddingBottom: 10, elevation: 5 }}>
-                                <Image
-                                    source={{ uri: baseUrl + this.state.current_page.cover_url }}
-                                    style={{ height: 200 }}
-                                    containerStyle={{ backgroundColor: '#000', borderBottomWidth: 0.5 }}
-                                    resizeMode='cover'
-                                />
+                                <TouchableWithoutFeedback
+                                    onPress={() => {
+                                        this.props.navigation.navigate('ImageView', {
+                                            uri: baseUrl + this.state.current_page.cover_url
+                                        })
+                                    }}
+                                >
+                                    <Image
+                                        source={{ uri: baseUrl + this.state.current_page.cover_url }}
+                                        style={{ height: 200 }}
+                                        containerStyle={{ backgroundColor: '#000', borderBottomWidth: 0.5 }}
+                                        resizeMode='cover'
+                                    />
+                                </TouchableWithoutFeedback>
                                 <Avatar
                                     rounded
                                     source={{
@@ -188,6 +196,11 @@ class Page extends Component {
                                     }}
                                     size={150}
                                     containerStyle={{ alignSelf: 'center', marginTop: -70, borderWidth: 0.5, backgroundColor: '#fff' }}
+                                    onPress={() => {
+                                        this.props.navigation.navigate('ImageView', {
+                                            uri: baseUrl + this.state.current_page.src
+                                        })
+                                    }}
                                 />
                             </Card>
                             <Card
